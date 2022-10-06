@@ -1,0 +1,3 @@
+clang
+-std=c11
+-DBACK_LINKS

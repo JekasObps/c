@@ -1,0 +1,41 @@
+### exclude all
+*
+
+### include some folders:
+!ds
+!ds/**
+!concepts
+!concepts/**
+!function_decorator
+!function_decorator/**
+!functional
+!functional/**
+!graphviz
+!graphviz/**
+!oop
+!oop/**
+!sorts
+!sorts/**
+!searches
+!searches/**
+!structs
+!structs/**
+
+### include some file extensions:
+
+!**.md
+!**.h
+!**.c
+
+.ccls-cache
+
+### exclude file extensions:
+**.d
+**.out
+**.o
+**.a
+**.so
+
+!makefile
+!.gitignore
+!.ccls
