@@ -35,6 +35,7 @@
 **.o
 **.a
 **.so
+**.vim
 
 !makefile
 !.gitignore
