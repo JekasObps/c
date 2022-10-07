@@ -42,7 +42,7 @@ static void print_exc(FILE *f);
 static void clear(void);
 
 /* public interface */
-thread_local struct exception_stack ExStack = {
+thread_local const struct exception_stack ExStack = {
     try,
     push_exdata,
     pop_exdata,

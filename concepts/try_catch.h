@@ -81,7 +81,7 @@ struct exception_stack
     void (*clear)(void);
 };
 
-extern thread_local struct exception_stack ExStack;
+extern thread_local const struct exception_stack ExStack;
 
 
 #endif/*__TRY_CATCH__*/
