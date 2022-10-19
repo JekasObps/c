@@ -11,17 +11,17 @@
 #define CORO_REWIND _state = 0
 #define VOID 
 
-#define _CAL1(ctx, a) a(ctx)
-#define _CAL2(ctx, a, b) a(ctx, b)
-#define _CAL3(ctx, a, b, c) a(ctx, b(ctx, c))
-#define _CAL4(ctx, a, b, c, d) a(ctx, b(ctx, c(ctx, d)))
-#define _CAL5(ctx, a, b, c, d, e) a(ctx, b(ctx, c(ctx, d(ctx, e))))
-#define _CAL6(ctx, a, b, c, d, e, f) a(ctx, b(ctx, c(ctx, d(ctx, e(ctx, f)))))
-#define _CAL7(ctx, a, b, c, d, e, f, g) a(ctx, b(ctx, c(ctx, d(ctx, e(ctx, f(ctx, g))))))
+#define _CAL1(a) a()
+#define _CAL2(a, b) a(b)
+#define _CAL3(a, b, c) a(b(c))
+#define _CAL4(a, b, c, d) a(b(c(d)))
+#define _CAL5(a, b, c, d, e) a(b(c(d(e))))
+#define _CAL6(a, b, c, d, e, f) a(b(c(d(e(f)))))
+#define _CAL7(a, b, c, d, e, f, g) a(b(c(d(e(f(g))))))
 
 #define _UNWRAP(M, _1, _2, _3, _4, _5, _6, _7, ARGN, ...) M##ARGN
 
 /* alternative syntax for chained function calls */
-#define PIPE(ctx, ...) _UNWRAP(_CAL, __VA_ARGS__, 7, 6, 5, 4, 3, 2, 1)(ctx, __VA_ARGS__) 
+#define PIPE(...) _UNWRAP(_CAL, __VA_ARGS__, 7, 6, 5, 4, 3, 2, 1)(__VA_ARGS__) 
 
 #endif/*_CORO_H_*/
