@@ -1,49 +1,33 @@
-#include "closure.h"
 #include <stdio.h>
+#include "closure.h"
 
-/* closure that reproduces itself */
-DEF_CLOSURE_RET(f1, void*, int, double)
-
-/* function that returns new closure with bound parameters */
-void* f1(int a, double b)
+typedef struct S
 {
-    void *ctx = MAKE_CLOSURE(f1, &f1); /* closure takes same f1 function pointer */
+    int a;
+    size_t b;
+} s_t;
 
-    BIND(f1, ctx, a);
-    BIND(f1, ctx, b);
+DEF_CLOSURE_RET(foo, 2, double, int, s_t, float, double, const char*)
 
-    return ctx;
-}
-
-void f2(void *ctx, const char* fmt)
+double foo(int a, s_t b, float c, double d, const char * str)
 {
-    CLOSURE_TYPE(f1) *c = ctx;
-    printf(fmt, c->_1, c->_2);
-    FREE_CLOSURE(ctx);
-    return;
+    printf("foo(%d, {a:%d, b:%lu}, %f, %lf, %s)\n", a, b.a, b.b, c, d, str);
+    return (d + c / a);
 }
-
-/* just for fun replicating oop-style syntax */
-#define F2(c) c )
-#define F1(a, b) f2(f1(a, b), F2
 
 int main (int argc, char *argv[])
 {
-    /* f2(f1(12, 23), "%d %f\n"); */
-    F1(12, 32)("%d %f\n"); /* so smooth */
-    
-    /* first time f1 called */
-    void *ctx1 = f1(1, 2.0);
-    /* every time CALL is used on that closure, it basically replicates itself */
-    void* ctx2 = CALL(f1, ctx1);
-    void *ctx3 = CALL(f1, ctx2);
+    void* ctx = MAKE_CLOSURE(foo, &foo);    
 
-    /* then f2 will consume each one of that closures, 
-     * note that it does closure free */
+    s_t s = {9, 19ul};
 
-    f2(ctx1, "%0.s %0.s\n");
-    f2(ctx2, "%d %2.2f\n");
-    f2(ctx3, "%d %0.0f\n");
+    BIND(foo, 1, ctx, 339);
+    BIND(foo, 2, ctx, s);
+
+    CALL(foo, ctx, 0.12f, 45.5, "OK dude");
+
+    FREE_CLOSURE(ctx);
 
     return 0;
 }
+
