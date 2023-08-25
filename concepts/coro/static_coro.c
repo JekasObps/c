@@ -1,4 +1,4 @@
-#include "coro.h"
+#include "static_coro.h"
 #include <stdio.h>
 
 int generator(int start, int end)

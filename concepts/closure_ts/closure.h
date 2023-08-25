@@ -14,9 +14,8 @@
 #define _ARG_NAME4( a, b, c, d) _ARG_NAME3( a, b, c),  _4
 #define _ARG_NAME5( a, b, c, d, e) _ARG_NAME4( a, b, c, d),  _5
 #define _ARG_NAME6( a, b, c, d, e, f) _ARG_NAME5( a, b, c, d, e),  _6
-
 #define _ARG_NAME(...) \
-    _UNWRAP(_ARG_NAME, __VA_ARGS__, 6, 5, 4, 3, 2, 1)(__VA_ARGS__)
+    _UNWRAP(_ARG_NAME, __VA_ARGS__, 6, 5, 4, 3, 2, 1)(__VA_ARGS__) 
 
 #define _IGNORE_FIRST0(...) __VA_ARGS__
 #define _IGNORE_FIRST1(a, ...) __VA_ARGS__
@@ -42,9 +41,8 @@
 #define _ARG4(del,  a, b, c, d) _ARG3(del,  a, b, c) del()  d _4
 #define _ARG5(del,  a, b, c, d, e) _ARG4(del,  a, b, c, d) del()  e _5
 #define _ARG6(del,  a, b, c, d, e, f) _ARG5(del,  a, b, c, d, e) del()  f _6
-
 #define _ARG(del, ...) \
-    _UNWRAP(_ARG, __VA_ARGS__, 6, 5, 4, 3, 2, 1)(del, __VA_ARGS__)
+    _UNWRAP(_ARG, __VA_ARGS__, 6, 5, 4, 3, 2, 1)(del, __VA_ARGS__) 
 
 #define _MAP1(T,  a) T _1:1
 #define _MAP2(T,  a, b) _MAP1(T,  a);  T _2:1
@@ -52,9 +50,8 @@
 #define _MAP4(T,  a, b, c, d) _MAP3(T,  a, b, c);  T _4:1
 #define _MAP5(T,  a, b, c, d, e) _MAP4(T,  a, b, c, d);  T _5:1
 #define _MAP6(T,  a, b, c, d, e, f) _MAP5(T,  a, b, c, d, e);  T _6:1
-
 #define _MAP(T, ...) \
-    _UNWRAP(_MAP, __VA_ARGS__, 6, 5, 4, 3, 2, 1)(T, __VA_ARGS__)
+    _UNWRAP(_MAP, __VA_ARGS__, 6, 5, 4, 3, 2, 1)(T, __VA_ARGS__) 
 
 
 #define _BIND_FUNC(name, type, argn) \
@@ -66,25 +63,13 @@
 
 
 #define _BIND1(name,  a)     _BIND_FUNC(name, a, 1)
-
-#define _BIND2(name,  a, b) _BIND1(name,  a)\
-     _BIND_FUNC(name, b, 2)
-
-#define _BIND3(name,  a, b, c) _BIND2(name,  a, b)\
-     _BIND_FUNC(name, c, 3)
-
-#define _BIND4(name,  a, b, c, d) _BIND3(name,  a, b, c)\
-     _BIND_FUNC(name, d, 4)
-
-#define _BIND5(name,  a, b, c, d, e) _BIND4(name,  a, b, c, d)\
-     _BIND_FUNC(name, e, 5)
-
-#define _BIND6(name,  a, b, c, d, e, f) _BIND5(name,  a, b, c, d, e)\
-     _BIND_FUNC(name, f, 6)
-
-
+#define _BIND2(name,  a, b) _BIND1(name,  a)      _BIND_FUNC(name, b, 2)
+#define _BIND3(name,  a, b, c) _BIND2(name,  a, b)      _BIND_FUNC(name, c, 3)
+#define _BIND4(name,  a, b, c, d) _BIND3(name,  a, b, c)      _BIND_FUNC(name, d, 4)
+#define _BIND5(name,  a, b, c, d, e) _BIND4(name,  a, b, c, d)      _BIND_FUNC(name, e, 5)
+#define _BIND6(name,  a, b, c, d, e, f) _BIND5(name,  a, b, c, d, e)      _BIND_FUNC(name, f, 6)
 #define _BIND(name, ...) \
-    _UNWRAP(_BIND, __VA_ARGS__, 6, 5, 4, 3, 2, 1)(name, __VA_ARGS__)
+    _UNWRAP(_BIND, __VA_ARGS__, 6, 5, 4, 3, 2, 1)(name, __VA_ARGS__) 
 
 #define _BOUND_ARG1( a) ctx->args.a
 #define _BOUND_ARG2( a, b) _BOUND_ARG1( a),  ctx->args.b
@@ -92,36 +77,14 @@
 #define _BOUND_ARG4( a, b, c, d) _BOUND_ARG3( a, b, c),  ctx->args.d
 #define _BOUND_ARG5( a, b, c, d, e) _BOUND_ARG4( a, b, c, d),  ctx->args.e
 #define _BOUND_ARG6( a, b, c, d, e, f) _BOUND_ARG5( a, b, c, d, e),  ctx->args.f
-
 #define _BOUND_ARG(bindc, ...) _BOUND_ARG##bindc(__VA_ARGS__) 
-
-#define _CALL(bindc, ...) \
-    _BOUND_ARG(bindc, _IGNORE_AFTER(bindc, __VA_ARGS__)),\
-    _IGNORE_FIRST(bindc, __VA_ARGS__)
 
 
 #define COMMA() ,
 #define SEMICO() ;
 
-#define _CLOSURE(name, bindc, bits, R, RET, ...) \
-    typedef R (*name##_fptr) (__VA_ARGS__);\
-    \
-    struct closure_##name {\
-        name##_fptr fn; \
-        \
-        struct name##_args {\
-            union u {\
-                struct map {\
-                    _MAP(uint##bits##_t, _IGNORE_AFTER(bindc, __VA_ARGS__));\
-                } _map;\
-                uint##bits##_t _bits[((bindc + bits - 1) / bits)];\
-            } u;\
-            _ARG(SEMICO, _IGNORE_AFTER(bindc, __VA_ARGS__));\
-        } args;\
-        \
-    };\
-    \
-    static size_t bitcount(uint##bits##_t* bitarr) {\
+#define BITCOUNT(bits) \
+    static inline size_t bitcount(uint##bits##_t* bitarr, int bindc) {\
         size_t count = 0;\
         for (size_t i = 0; i < ((bindc + bits - 1) / bits); ++i)\
         {\
@@ -133,7 +96,35 @@
             }\
         }\
         return count;\
-    }\
+    }
+
+/* Generate all possible weak implementations for bitcount func */
+BITCOUNT(8)
+BITCOUNT(16)
+BITCOUNT(32)
+BITCOUNT(64)
+
+#define _CALL(bindc, ...) \
+    _BOUND_ARG(bindc, _IGNORE_AFTER(bindc, __VA_ARGS__)),\
+    _IGNORE_FIRST(bindc ,##__VA_ARGS__)
+
+#define _CLOSURE(name, bindc, bits, R, RET, ...) \
+    typedef R (*name##_fptr) (__VA_ARGS__);\
+    \
+    struct closure_##name {\
+        name##_fptr fn; \
+        \
+        struct name##_args {\
+            union {\
+                struct {\
+                    _MAP(uint##bits##_t, _IGNORE_AFTER(bindc, __VA_ARGS__));\
+                } _map;\
+                uint##bits##_t _bits[((bindc + bits - 1) / bits)];\
+            } u;\
+            _ARG(SEMICO, _IGNORE_AFTER(bindc, __VA_ARGS__));\
+        } args;\
+        \
+    };\
     \
     struct closure_##name * make_##name (name##_fptr fn) {\
         struct closure_##name *ctx = calloc(1, sizeof(*ctx));\
@@ -146,8 +137,8 @@
     \
     _BIND(name, _IGNORE_AFTER(bindc, __VA_ARGS__))\
     \
-    R call_##name (struct closure_##name * ctx, _IGNORE_FIRST(bindc, _ARG(COMMA, __VA_ARGS__))) {\
-        assert(bitcount(ctx->args.u._bits) == bindc && "Unbound arguments left, undefined behavior.");\
+    R call_##name (struct closure_##name *ctx, _IGNORE_FIRST(bindc, _ARG(COMMA, __VA_ARGS__))) {\
+        assert(bitcount(ctx->args.u._bits, bindc) == bindc && "Unbound arguments left, undefined behavior.");\
         RET ctx->fn(_CALL(bindc, _ARG_NAME(__VA_ARGS__)));\
     }
 

@@ -9,6 +9,8 @@ typedef struct S
 
 DEF_CLOSURE_RET(foo, 2, double, int, s_t, float, double, const char*)
 
+DEF_CLOSURE_RET(foo2, 2, double, int, int, char*)
+
 double foo(int a, s_t b, float c, double d, const char * str)
 {
     printf("foo(%d, {a:%d, b:%lu}, %f, %lf, %s)\n", a, b.a, b.b, c, d, str);

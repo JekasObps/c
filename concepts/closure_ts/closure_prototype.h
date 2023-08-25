@@ -132,25 +132,8 @@
 
 #define _CALL(bindc, ...) _BOUND_ARG(bindc, _IGNORE_AFTER(bindc, __VA_ARGS__)), _IGNORE_FIRST(bindc, __VA_ARGS__)
 
-#define _CLOSURE(name, bindc, bits, R, RET, ...) \
-    typedef R (*name##_fptr) (__VA_ARGS__);\
-    \
-    struct closure_##name {\
-        name##_fptr fn; \
-        \
-        struct name##_args {\
-            union u {\
-                struct map {\
-                    _MAP(uint##bits##_t, _IGNORE_AFTER(bindc, __VA_ARGS__));\
-                } _map;\
-                uint##bits##_t _bits[((bindc + bits - 1) / bits)];\
-            } u;\
-            _ARGS(SEMICO, _IGNORE_AFTER(bindc, __VA_ARGS__));\
-        } args;\
-        \
-    };\
-    \
-    static size_t bitcount(uint##bits##_t* bitarr) {\
+#define BITCOUNT(bits) \
+    static inline size_t bitcount(uint##bits##_t* bitarr, int bindc) {\
         size_t count = 0;\
         for (size_t i = 0; i < ((bindc + bits - 1) / bits); ++i)\
         {\
@@ -162,7 +145,30 @@
             }\
         }\
         return count;\
-    }\
+    }
+
+BITCOUNT(8);
+BITCOUNT(16);
+BITCOUNT(32);
+BITCOUNT(64);
+
+#define _CLOSURE(name, bindc, bits, R, RET, ...) \
+    typedef R (*name##_fptr) (__VA_ARGS__);\
+    \
+    struct closure_##name {\
+        name##_fptr fn; \
+        \
+        struct name##_args {\
+            union {\
+                struct {\
+                    _MAP(uint##bits##_t, _IGNORE_AFTER(bindc, __VA_ARGS__));\
+                } _map;\
+                uint##bits##_t _bits[((bindc + bits - 1) / bits)];\
+            } u;\
+            _ARGS(SEMICO, _IGNORE_AFTER(bindc, __VA_ARGS__));\
+        } args;\
+        \
+    };\
     \
     struct closure_##name * make_##name (name##_fptr fn) {\
         struct closure_##name *ctx = calloc(1, sizeof(*ctx));\
@@ -176,7 +182,7 @@
     _BIND(name, _IGNORE_AFTER(bindc, __VA_ARGS__))\
     \
     R call_##name (struct closure_##name * ctx, _IGNORE_FIRST(bindc, _ARGS(COMMA, __VA_ARGS__))) {\
-        assert(bitcount(ctx->args.u._bits) == bindc \
+        assert(bitcount(ctx->args.u._bits, bindc) == bindc \
             && "Unbound arguments left, undefined behavior.");\
         RET ctx->fn(_CALL(bindc, _ARG_NAME(__VA_ARGS__)));\
     }
