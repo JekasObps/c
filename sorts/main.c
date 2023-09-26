@@ -21,7 +21,7 @@ int main(int argc, char **argv)
     print(arr, LEN(arr));
     puts("sort...\n");
 
-    /* buble_sort(arr, sizeof(int), LEN(arr), (is_before)int_is_before); */
-    int_buble_sort(arr, LEN(arr), (is_before)int_is_before);
+    buble_sort(arr, sizeof(int), LEN(arr), (is_before)int_is_before);
+    // int_buble_sort(arr, LEN(arr), (is_before)int_is_before);
     print(arr, LEN(arr));
 }
